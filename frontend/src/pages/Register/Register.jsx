@@ -23,14 +23,35 @@ function Register(){
     }
 
     const handleSubmit=async(e)=>{
+        e.preventDefault();
 
+        try {
+            const response = await axios.post(
+              `${process.env.REACT_APP_BACKEND_URL}/api/users/register`,
+              formData
+            );
+        
+            if (response.status === 201) {
+              alert('Registrazione completata!');
+              console.log(response.data);
+            }
+          } catch (error) {
+            console.error("Errore completo:", error); // 👈 questo mostra TUTTO
+  console.log("Response:", error.response); // 👈 utile per capire lo status
+            // ✅ Se l'utente è già registrato o ci sono altri errori
+            if (error.response?.status === 400) {
+                alert(error.response.data.message || 'Utente già registrato');
+            } else {
+                alert('Errore del server. Riprova più tardi.');
+            }
+        }
     }
 
     return (
         <Container fluid className={`${styles.containerMain }`}>
             <div  className={`${styles.containerForm}`}>
                 <h1 className="text-center text-light">Registrazione</h1>
-                <Form onSubmit={{handleSubmit}}>
+                <Form onSubmit={handleSubmit}>
                     <InputField
                         label="NOME"
                         type='text'
@@ -69,8 +90,9 @@ function Register(){
                             onChange={handleChange}
                         />
                     </Form.Group>
+                    <Button variant="primary" type="submit" className="w-100 mt-5">Registrazione</Button>
                 </Form>
-                <Button variant="primary" type="submit" className="w-100 mt-5">Registrazione</Button>
+                
             </div>
         </Container>
     )
